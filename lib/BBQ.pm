@@ -268,11 +268,23 @@ sub op {
 =cut
 
 sub cl {
+
+warn "caller: " . join(':', caller)."\n";
     my ($tag) = @_;
 
-    if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'close'}->{$tag} ) {
+    if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'close'}->{$tag} && $bbq->{path} ) {
         # at first, we should close previouse opened tag
-        $bbq->{'close'}->{$bbq->{path}->[-1]}->($bbq) if $bbq->{path}->[-1] ne $tag;
+warn "TAG: $tag - " . Dumper($bbq->{path});
+        while ( $bbq->{path} && $bbq->{path}->[-1] ne $tag ) {
+          warn Dumper($bbq->{path}) . ' - ' . $tag."\n";
+            $bbq->{on_close}->($bbq->{path}->[-1]);
+        }
+
+        # no open tag - exit
+        unless ( $bbq->{path} ) {
+            $bbq->{out} .= '[/' . $tag . ']' if $bbq->{leave};
+            return;
+        }
 
         $bbq->{'close'}->{$tag}->($bbq);
         pop @{$bbq->{path}} if $bbq->{path};
