@@ -10,7 +10,7 @@ use Data::Dumper;
 
 =head1 NAME
 
-BBQ - The great new BBQ!
+BBQ - fastest pure Perl BBCode parser
 
 =head1 VERSION
 
@@ -46,13 +46,11 @@ $bbq = {
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
+Processing BBCodes as fast as possible.
 
     use BBQ;
 
-    my $foo = BBQ->new();
+    my $bbq = BBQ->new();
     ...
 
 =head1 EXPORT
@@ -87,6 +85,64 @@ sub init {
 
     $bbq->{set} = $BBQ::Formats::formats{$bbq->{'format'}} if ! $bbq->{set} || exists $args{'format'};
     $bbq->{enabled}->{$_}++ for @{$bbq->{set}};
+}
+
+=head2 parse
+
+=cut
+
+sub parse {
+    my ($class, $content, %args) = @_;
+
+    # чтоб не поломать старый код
+    $bbq = $class if ref $class;
+
+    $class->init( %args ) if %args;
+
+    $bbq->{in}  = {};
+    $bbq->{out} = '';
+
+    while ( $content =~ /\G(?:.*?)(?:\[([^\]]+)\]|([^\[]+))/gs ) {
+        my ($tag, $text) = ($1, $2);
+
+        if ( $tag ) {
+            $tag = lc $tag;
+
+            if ( index($tag, '/') == 0 && ref $bbq->{on_close} ) {
+                $tag = substr($tag, 1);
+
+                $bbq->{on_close}->($tag);
+                next;
+            }
+
+            my $t = index($tag, '=');
+            my $arg;
+            ( $tag, $arg ) = ( substr($tag, 0, $t), substr($tag, ++$t) ) if $t > -1;
+
+            $bbq->{on_open}->($tag, $arg) if ref $bbq->{on_open}
+        }
+        else {
+            $bbq->{on_text}->($text) if ref $bbq->{on_text}
+        }
+    }
+
+    return $bbq->{out};
+}
+
+=head2 default
+
+=cut
+
+sub default {
+    my %args = @_;
+    init(
+        'fake_class',
+        debug  => 0,
+        ( ! exists $args{set} ? (format => 'default') : () ),
+        leave  => 1,
+        pda    => 0,
+        %args,
+    );
 }
 
 =head1 AUTHOR
@@ -179,55 +235,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =cut
 
 
-sub default {
-    my %args = @_;
-    init(
-        'fake_class',
-        debug  => 0,
-        ( ! exists $args{set} ? (format => 'default') : () ),
-        leave  => 1,
-        pda    => 0,
-        %args,
-    );
-}
-
-sub parse {
-    my ($class, $content, %args) = @_;
-
-    # чтоб не поломать старый код
-    $bbq = $class if ref $class;
-
-    $class->init( %args ) if %args;
-
-    $bbq->{in}  = {};
-    $bbq->{out} = '';
-
-    while ( $content =~ /\G(?:.*?)(?:\[([^\]]+)\]|([^\[]+))/gs ) {
-        my ($tag, $text) = ($1, $2);
-
-        if ( $tag ) {
-            $tag = lc $tag;
-
-            if ( index($tag, '/') == 0 && ref $bbq->{on_close} ) {
-                $tag = substr($tag, 1);
-
-                $bbq->{on_close}->($tag);
-                next;
-            }
-
-            my $t = index($tag, '=');
-            my $arg;
-            ( $tag, $arg ) = ( substr($tag, 0, $t), substr($tag, ++$t) ) if $t > -1;
-
-            $bbq->{on_open}->($tag, $arg) if ref $bbq->{on_open}
-        }
-        else {
-            $bbq->{on_text}->($text) if ref $bbq->{on_text}
-        }
-    }
-
-    return $bbq->{out};
-}
+=head2 op
+=cut
 
 sub op {
     my ($tag, $arg ) = @_;
@@ -244,6 +253,9 @@ sub op {
     }
 }
 
+=head2 cl
+=cut
+
 sub cl {
     my ($tag) = @_;
 
@@ -255,6 +267,9 @@ sub cl {
         $bbq->{out} .= '[/' . $tag . ']';
     }
 }
+
+=head2 tx
+=cut
 
 sub tx {
     my ($text) = @_;
@@ -272,7 +287,6 @@ sub import {
     return if $imported;
 
     my $dir = $INC{'BBQ.pm'};
-warn "DIR: $dir\n";
     $dir =~ s/\/BBQ\.pm$//;
     my @files = glob("$dir/BBQ/Tags/*.pm");
 

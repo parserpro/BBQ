@@ -1,9 +1,22 @@
 package BBQ::Formats;
 use common::sense;
 
+=head1 NAME
+
+BBQ::Formats
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
 our %formats = (
     default => [qw(b)],
 );
+
+=head2 full_set
+=cut
 
 sub full_set {
     my %tags;
