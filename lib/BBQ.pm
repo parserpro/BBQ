@@ -128,6 +128,12 @@ sub parse {
         }
     }
 
+    for ( my($k, $v) = each %{$bbq->{in}}) {
+        if ( $v ) {
+            $bbq->{on_close}->($k) for 1..$v;
+        }
+    }
+
     return $bbq->{out};
 }
 
@@ -267,7 +273,7 @@ sub cl {
 
     if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'close'}->{$tag} ) {
         $bbq->{'close'}->{$tag}->($bbq);
-        pop @{$bbq->{path}};
+        pop @{$bbq->{path}} if $bbq->{path};
     }
     elsif ( $bbq->{leave} ) {
         $bbq->{out} .= '[/' . $tag . ']';
