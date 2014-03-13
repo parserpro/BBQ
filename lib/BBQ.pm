@@ -6,6 +6,7 @@ use warnings FATAL => 'all';
 use utf8;
 use FindBin;
 use BBQ::Formats;
+use Carp;
 use Data::Dumper;
 
 =head1 NAME
@@ -79,7 +80,8 @@ sub new {
 sub init {
     my ( $class, %args ) = @_;
     $bbq->{enabled} = {};
-    for ( grep {exists $args{$_}} qw(debug format set leave pda) ) {
+
+    for ( grep {exists $args{$_}} qw(debug format set leave pda path in out) ) {
         $bbq->{$_} = $args{$_}
     };
 
@@ -134,6 +136,7 @@ sub parse {
 =cut
 
 sub default {
+    shift @_ if ref $_[0] eq 'BBQ';
     my %args = @_;
     init(
         'fake_class',
@@ -141,6 +144,9 @@ sub default {
         ( ! exists $args{set} ? (format => 'default') : () ),
         leave  => 1,
         pda    => 0,
+        path   => [],
+        in     => {},
+        out    => '',
         %args,
     );
 }
