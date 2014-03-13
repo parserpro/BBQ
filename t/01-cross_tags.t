@@ -5,16 +5,19 @@ use warnings FATAL => 'all';
 use Test::More;
 use Data::Dumper;
 
-plan tests => 2;
+plan tests => 3;
 
 use_ok( 'BBQ' ) || print "Bail out!\n";
 
 my $text = '0[b]1[i]2[/b]3';
 my $bbq = BBQ->new;
 my $out = $bbq->parse($text);
-
-
 is($out, '0<strong>1<i>2</i></strong>3', 'autoclose tags without interfere');
+
+
+$bbq->default;
+$out = $bbq->parse('1[b]2[b]3[i]4[/b]5');
+is($out, '1<strong>2<strong>3<i>4</i></strong>5</strong>', 'autoclose tags without interfere - 2');
 =cut
 is_deeply( $bbq->{path}, [], 'balanced path test');
 

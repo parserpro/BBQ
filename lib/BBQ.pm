@@ -101,8 +101,9 @@ sub parse {
 
     $class->init( %args ) if %args;
 
-    $bbq->{in}  = {};
-    $bbq->{out} = '';
+    $bbq->{in}   = {};
+    $bbq->{out}  = '';
+    $bbq->{path} = [];
 
     while ( $content =~ /\G(?:.*?)(?:\[([^\]]+)\]|([^\[]+))/gs ) {
         my ($tag, $text) = ($1, $2);
