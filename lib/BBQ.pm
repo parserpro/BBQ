@@ -128,10 +128,8 @@ sub parse {
         }
     }
 
-    for ( my($k, $v) = each %{$bbq->{in}}) {
-        if ( $v ) {
-            $bbq->{on_close}->($k) for 1..$v;
-        }
+    for my $tag ( reverse @{$bbq->{path}} ) {
+        $bbq->{on_close}->($tag);
     }
 
     return $bbq->{out};
@@ -257,7 +255,7 @@ sub op {
         push @{$bbq->{path}}, $tag;
         $bbq->{'open'}->{$tag}->($bbq, $arg);
 
-        # закрывающего тэга нет - убираем за собой
+        # tag shouldn't be closed - wipe it out
         pop @{$bbq->{path}} unless exists $bbq->{'close'}->{$tag};
     }
     elsif ( $bbq->{leave} ) {
@@ -272,6 +270,9 @@ sub cl {
     my ($tag) = @_;
 
     if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'close'}->{$tag} ) {
+        # at first, we should close previouse opened tag
+        $bbq->{'close'}->{$bbq->{path}->[-1]}->($bbq) if $bbq->{path}->[-1] ne $tag;
+
         $bbq->{'close'}->{$tag}->($bbq);
         pop @{$bbq->{path}} if $bbq->{path};
     }

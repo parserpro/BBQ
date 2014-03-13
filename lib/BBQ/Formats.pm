@@ -12,7 +12,7 @@ Version 0.01
 =cut
 
 our %formats = (
-    default => [qw(b)],
+    default => [qw(b i)],
 );
 
 =head2 full_set
