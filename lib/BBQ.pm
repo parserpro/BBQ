@@ -111,7 +111,7 @@ sub parse {
         if ( $tag ) {
             $tag = lc $tag;
 
-            if ( index($tag, '/') == 0 && ref $bbq->{on_close} ) {
+            if ( index($tag, '/') == 0 && ref $bbq->{on_close} eq 'CODE' ) {
                 $tag = substr($tag, 1);
 
                 $bbq->{on_close}->($tag);
@@ -254,7 +254,12 @@ sub op {
 
     if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'open'}->{$tag} ) {
         push @{$bbq->{path}}, $tag;
-        $bbq->{'open'}->{$tag}->($bbq, $arg);
+
+        unless ( $bbq->{'open'}->{$tag}->($bbq, $arg) ) {
+            pop @{$bbq->{path}};
+            $bbq->{out} .= '[' . $tag . ( $arg ? '=' . $arg : '' ) . ']' if $bbq->{leave};
+            return;
+        };
 
         # tag shouldn't be closed - wipe it out
         pop @{$bbq->{path}} unless exists $bbq->{'close'}->{$tag};

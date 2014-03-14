@@ -16,6 +16,7 @@ sub open {
     my $self = shift;
     $self->{out} .= '<strong>';
     $self->{in}->{b}++;
+    1;
 }
 
 =head2 close

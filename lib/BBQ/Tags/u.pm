@@ -16,6 +16,7 @@ sub open {
     my $self = shift;
     $self->{out} .= '<span style="text-decoration: underline">';
     $self->{in}->{u}++;
+    1;
 }
 
 =head2 close
