@@ -33,7 +33,7 @@ my %colors = map { $_ => 1 } qw(snow ghostwhite whitesmoke gainsboro floralwhite
 
 =head1 NAME
 
-BBQ::Tags::b
+BBQ::Tags::color
 
 =head1 VERSION
 

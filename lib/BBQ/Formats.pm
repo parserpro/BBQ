@@ -12,7 +12,7 @@ Version 0.01
 =cut
 
 our %formats = (
-    default => [qw(b i u color)],
+    default => [qw(b i u color * list)],
 );
 
 =head2 full_set

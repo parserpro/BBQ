@@ -3,7 +3,7 @@ use common::sense;
 
 =head1 NAME
 
-BBQ::Tags::b
+BBQ::Tags::i
 
 =head1 VERSION
 

@@ -287,6 +287,8 @@ sub cl {
             return;
         }
 
+        warn Dumper($bbq) if $tag eq '*';
+
         $bbq->{'close'}->{$tag}->($bbq);
         pop @{$bbq->{path}} if $bbq->{path};
     }
@@ -335,7 +337,10 @@ sub import {
 
         $all{$file} = {
             'open'  => \&{$mod . '::open'},
-            'close' => \&{$mod . '::close'},
+            (
+                $mod->can('close') ?
+                    ( 'close' => \&{$mod . '::close'} ) : (),
+            ),
             (
                 $mod->can('text') ?
                     ( 'text'  =>  \&{$mod . '::text'} ) : (),
