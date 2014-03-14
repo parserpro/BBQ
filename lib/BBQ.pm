@@ -304,7 +304,7 @@ sub tx {
     my ($text) = @_;
     my $tag = $bbq->{path}->[-1];
 
-    if ( $tag && exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'text'}->{$tag} ) {
+    if ( $tag && exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'text'}->{$tag} && $bbq->{in}->{$tag} ) {
         $bbq->{'text'}->{$tag}->($bbq, @_);
     }
     else {

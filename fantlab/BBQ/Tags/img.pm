@@ -9,7 +9,7 @@ sub open {
 sub text {
     my ( $self, $text ) = @_;
 
-    $self->{out} .= '<img src="' . $text . '">';
+    $self->{out} .= '<img src="' . $text . '" alt="" />';
 }
 
 sub close {
