@@ -5,7 +5,7 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'BBQ',
-    license             => 'Artistic_2_0',
+    license             => 'perl',
     dist_author         => q{Demiurg <parserpro@gmail.com>},
     dist_version_from   => 'lib/BBQ.pm',
     release_status      => 'stable',

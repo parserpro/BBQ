@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use Test::More;
 use Data::Dumper;
 
-plan tests => 5;
+plan tests => 7;
 
 use_ok( 'BBQ' ) || print "Bail out!\n";
 
@@ -28,3 +28,14 @@ my $text3 = '1[/b]2';
 $bbq->default;
 $out = $bbq->parse($text3);
 is($out, '1[/b]2', 'unbalanced close tag');
+
+my $text4 = '[b][u]123[/b][/u]';
+$bbq->default;
+$out = $bbq->parse($text4);
+is($out, '<strong><span style="text-decoration: underline">123</span></strong>[/u]', 'crossed tags');
+
+my $text5 = '[b][u]123[/b][/u]';
+$bbq->default(leave => 0);
+$out = $bbq->parse($text5);
+is($out, '<strong><span style="text-decoration: underline">123</span></strong>', 'crossed tags (leave = 0)');
+

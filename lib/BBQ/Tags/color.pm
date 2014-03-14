@@ -49,7 +49,7 @@ sub open {
     return 0 unless $colors{$arg} || $arg =~ /^#[0-9ABCDEF]{1,6}$/i;
 
     $self->{out} .= qq~<span style="color:$arg">~;
-    $self->{in}->{u}++;
+    $self->{in}->{color}++;
     1;
 }
 
@@ -58,9 +58,9 @@ sub open {
 
 sub close {
     my $self = shift;
-    return unless $self->{in}->{u};
+    return unless $self->{in}->{color};
     $self->{out} .= '</span>';
-    $self->{in}->{u}--;
+    $self->{in}->{color}--;
 }
 
 1;
