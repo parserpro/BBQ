@@ -12,16 +12,15 @@ Version 0.01
 =head2 open
 =cut
 
-my @stack;
 my %lists = (
-  1 => '<ol style="list-style-type: decimal;">',
-  I => '<ol style="list-style-type: upper-roman;">',
-  A => '<ol style="list-style-type: upper-alpha;">',
-  i => '<ol style="list-style-type: lower-roman;">',
-  a => '<ol style="list-style-type: lower-alpha;">',
-  o => '<ol style="list-style-type: circle;">',
-  O => '<ol style="list-style-type: disc;">',
-  n => '<ol style="list-style-type: none;">',
+  1 => 'decimal',
+  I => 'upper-roman',
+  A => 'upper-alpha',
+  i => 'lower-roman',
+  a => 'lower-alpha',
+  o => 'circle',
+  O => 'disc',
+  n => 'none',
 );
 
 sub open {
@@ -29,7 +28,7 @@ sub open {
     $style = 'O' unless $style;
     return unless $lists{$style};
 
-    $self->{out} .= $lists{$style};
+    $self->{out} .= '<ol style="list-style-type: ' . $lists{$style} . ';">';
     $self->{in}->{ul}++;
     1;
 }
