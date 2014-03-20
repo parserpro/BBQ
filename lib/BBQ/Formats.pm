@@ -12,7 +12,7 @@ Version 0.01
 =cut
 
 our %formats = (
-    default => [qw(b i u color * list size center img left right a s d)],
+    default => [qw(b i u color * list size center img left right)],
 );
 
 =head2 full_set
