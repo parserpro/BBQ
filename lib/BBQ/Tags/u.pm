@@ -1,6 +1,7 @@
 package BBQ::Tags::u;
 use common::sense;
 
+our @alias = qw(u1);
 =head1 NAME
 
 BBQ::Tags::u

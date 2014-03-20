@@ -122,10 +122,10 @@ sub parse {
             my $arg;
             ( $tag, $arg ) = ( substr($tag, 0, $t), substr($tag, ++$t) ) if $t > -1;
 
-            $bbq->{on_open}->($tag, $arg) if ref $bbq->{on_open}
+            $bbq->{on_open}->($tag, $arg) if ref $bbq->{on_open} eq 'CODE';
         }
         else {
-            $bbq->{on_text}->($text) if ref $bbq->{on_text}
+            $bbq->{on_text}->($text) if ref $bbq->{on_text} eq 'CODE';
         }
     }
 
@@ -327,25 +327,27 @@ sub import {
         warn $@ if $@;
 
         {
-            no strict;
+            no strict 'refs';
             no warnings 'once';
 
             if ( ${ $mod . '::tag'} ) {
                 $file = ${ $mod . '::tag'};
             }
-        }
 
-        $all{$file} = {
-            'open'  => \&{$mod . '::open'},
-            (
-                $mod->can('close') ?
-                    ( 'close' => \&{$mod . '::close'} ) : (),
-            ),
-            (
-                $mod->can('text') ?
-                    ( 'text'  =>  \&{$mod . '::text'} ) : (),
-            ),
-        };
+            for my $tag ( $file, @{ $mod . '::alias' ? $mod . '::alias' : [] } ) {
+                $all{$tag} = {
+                    'open'  => \&{$mod . '::open'},
+                    (
+                        $mod->can('close') ?
+                            ( 'close' => \&{$mod . '::close'} ) : (),
+                    ),
+                    (
+                        $mod->can('text') ?
+                            ( 'text'  =>  \&{$mod . '::text'} ) : (),
+                    ),
+                };
+            }
+        }
     }
 
     for my $tag ( keys %all ) {

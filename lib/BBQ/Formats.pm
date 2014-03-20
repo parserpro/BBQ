@@ -12,11 +12,10 @@ Version 0.01
 =cut
 
 our %formats = (
-    default => [qw(b i u color * list size center img)],
+    default => [qw(b i u color * list size center img left right a s d)],
 );
 
 =head2 full_set
-=cut
 
 sub full_set {
     my %tags;
@@ -29,5 +28,7 @@ sub full_set {
 
     return keys %tags;
 }
+
+=cut
 
 1;
