@@ -1,10 +1,9 @@
-package BBQ::Tags::u;
+package BBQ::Tags::s;
 use common::sense;
 
-our @alias = qw(u1);
 =head1 NAME
 
-BBQ::Tags::u
+BBQ::Tags::s
 
 =head1 VERSION
 
@@ -15,8 +14,8 @@ Version 0.01
 
 sub open {
     my $self = shift;
-    $self->{out} .= '<span style="text-decoration: underline">';
-    $self->{in}->{u}++;
+    $self->{out} .= '<span style="text-decoration:line-through;">';
+    $self->{in}->{s}++;
     1;
 }
 
@@ -25,9 +24,9 @@ sub open {
 
 sub close {
     my $self = shift;
-    return unless $self->{in}->{u};
+    return unless $self->{in}->{s};
     $self->{out} .= '</span>';
-    $self->{in}->{u}--;
+    $self->{in}->{s}--;
 }
 
 1;

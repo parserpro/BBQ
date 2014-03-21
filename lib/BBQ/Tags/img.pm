@@ -14,7 +14,7 @@ Version 0.01
 
 sub open {
     my ($self, $href) = @_;
-    return 0 if $href =~ /[>\"]/;
+    return 0 if $href =~ /[<>\"]/;
 
     if ( $href ) {
         $self->{out} .= '<img src="' . $href . '" alt="" />';

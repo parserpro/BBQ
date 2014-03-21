@@ -13,14 +13,14 @@ Version 0.01
 =cut
 
 my %lists = (
-  1 => 'decimal',
-  I => 'upper-roman',
-  A => 'upper-alpha',
-  i => 'lower-roman',
-  a => 'lower-alpha',
-  o => 'circle',
-  O => 'disc',
-  n => 'none',
+    1 => 'decimal',
+    I => 'upper-roman',
+    A => 'upper-alpha',
+    i => 'lower-roman',
+    a => 'lower-alpha',
+    o => 'circle',
+    O => 'disc',
+    n => 'none',
 );
 
 sub open {
