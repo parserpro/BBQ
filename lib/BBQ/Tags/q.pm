@@ -10,12 +10,36 @@ BBQ::Tags::q
 
 Version 0.01
 
+=head1 DESCRIPTION
+
+Requires CSS:
+  --- cut ---
+  .quote div {
+    background-color: #f6f6f6;
+    border: 1px solid gray;
+    padding: 4px;
+  }
+
+  .quote p {
+    margin: 0;
+  }
+
+  .quote cite {
+    font-weight: bold;
+    font-style: normal;
+  }
+
+  .quote {
+    color: #606060;
+  }
+  --- cut ---
+
 =head2 open
 =cut
 
 sub open {
     my ($self, $arg) = @_;
-    return 0 if $arg =~ /[\"<>]/;
+    return 0 if $arg =~ /[<>]/;
 
     $self->{out} .= qq~<blockquote class="quote"><p>цитата <cite>$arg</cite></p><div>~;
     $self->{in}->{q}++;
