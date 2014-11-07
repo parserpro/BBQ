@@ -2,6 +2,7 @@ package BBQ::Tags::q;
 use common::sense;
 
 our @alias = qw(quote);
+
 =head1 NAME
 
 BBQ::Tags::q

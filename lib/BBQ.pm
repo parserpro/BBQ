@@ -109,6 +109,10 @@ sub parse {
         my ($tag, $text) = ($1, $2);
 
         if ( $tag ) {
+            my $t = index($tag, '=');
+            my $arg;
+            ( $tag, $arg ) = ( substr($tag, 0, $t), substr($tag, ++$t) ) if $t > -1;
+
             $tag = lc $tag;
 
             if ( index($tag, '/') == 0 && ref $bbq->{on_close} eq 'CODE' ) {
@@ -117,10 +121,6 @@ sub parse {
                 $bbq->{on_close}->($tag);
                 next;
             }
-
-            my $t = index($tag, '=');
-            my $arg;
-            ( $tag, $arg ) = ( substr($tag, 0, $t), substr($tag, ++$t) ) if $t > -1;
 
             $bbq->{on_open}->($tag, $arg) if ref $bbq->{on_open} eq 'CODE';
         }
