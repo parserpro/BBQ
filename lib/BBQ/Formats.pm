@@ -12,7 +12,7 @@ Version 0.01
 =cut
 
 our %formats = (
-    default => [qw(b i u color * list size center img left right p code s q qoute url)],
+    default => [qw(b i u color * list size center img left right p code s q qoute url spoiler)],
 );
 
 =head2 full_set
