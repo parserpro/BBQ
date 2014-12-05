@@ -252,11 +252,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 sub op {
     my ($tag, $arg ) = @_;
 
+    # если тэг разрешен и у него есть обработчик открытия тэга
     if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'open'}->{$tag} ) {
+        # добавляем тэг к текущему пути
         push @{$bbq->{path}}, $tag;
 
+        # если обработчик открытия тэга не вернул TRUE
         unless ( $bbq->{'open'}->{$tag}->($bbq, $arg) ) {
+            # убираем тэг от текущего пути
             pop @{$bbq->{path}};
+
+            # выдаем исходник тэга если есть соотв. настройка
             $bbq->{out} .= '[' . $tag . ( $arg ? '=' . $arg : '' ) . ']' if $bbq->{leave};
             return;
         };
@@ -276,9 +282,11 @@ sub cl {
     my ($tag) = @_;
 
     if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'close'}->{$tag} && @{$bbq->{path}} ) {
-        # at first, we should close previouse opened tag
-        while ( @{$bbq->{path}} && $bbq->{path}->[-1] ne $tag ) {
-            $bbq->{on_close}->($bbq->{path}->[-1]);
+        if ( $bbq->{path}->[-1] ne 'work_t' ) {
+            # at first, we should close previouse opened tag
+            while ( @{$bbq->{path}} && $bbq->{path}->[-1] ne $tag ) {
+                $bbq->{on_close}->($bbq->{path}->[-1]);
+            }
         }
 
         # no open tag - exit
@@ -286,8 +294,6 @@ sub cl {
             $bbq->{out} .= '[/' . $tag . ']' if $bbq->{leave};
             return;
         }
-
-        warn Dumper($bbq) if $tag eq '*';
 
         $bbq->{'close'}->{$tag}->($bbq);
         pop @{$bbq->{path}} if $bbq->{path};

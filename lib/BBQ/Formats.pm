@@ -1,5 +1,6 @@
 package BBQ::Formats;
 use common::sense;
+use utf8;
 
 =head1 NAME
 
@@ -12,7 +13,7 @@ Version 0.01
 =cut
 
 our %formats = (
-    default => [qw(b i u color * list size center img left right p code s q qoute url spoiler)],
+    default => [qw(b i u color * list size center img left right p code s q qoute url spoiler work work_t)],
 );
 
 =head2 full_set

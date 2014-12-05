@@ -3,6 +3,7 @@ use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use utf8;
 
 plan tests => 2;
 

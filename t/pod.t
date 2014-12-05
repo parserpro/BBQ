@@ -3,6 +3,7 @@ use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use utf8;
 
 # Ensure a recent version of Test::Pod
 my $min_tp = 1.22;

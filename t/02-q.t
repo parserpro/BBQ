@@ -4,6 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use utf8;
 use Test::More;
+use utf8;
 
 plan tests => 2;
 
