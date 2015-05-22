@@ -9,7 +9,7 @@ plan tests => 2;
 
 use_ok( 'BBQ' ) || print "Bail out!\n";
 
-my $text = 'pre [code]bold[/code] past';
+my $text = 'pre [code=Примерчик]<xml> [comment][/code] past';
 my $bbq = BBQ->new;
 my $out = $bbq->parse($text);
-is($out, 'pre <pre>bold</pre> past', 'Simple [code]');
+is($out, 'pre <fieldset class="q pre"><legend>Примерчик</legend>&lt;xml&gt; [comment]</fieldset> past', 'Simple [code]');

@@ -1,6 +1,17 @@
 package BBQ::Tags::url;
 use common::sense;
 
+=head1 NAME
+
+BBQ::Tags::b
+
+=head1 VERSION
+
+Version 0.01
+
+=head2 open
+=cut
+
 sub open {
     my ( $self, $arg ) = @_;
 
@@ -12,7 +23,12 @@ sub open {
         $self->{out} .= qq{<a href="$arg" rel="nofollow" target="_blank">};
         $self->{in}->{url}++;
     }
+
+    1;
 }
+
+=head2 close
+=cut
 
 sub close {
     my $self = shift;
