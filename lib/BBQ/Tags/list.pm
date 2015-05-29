@@ -30,7 +30,7 @@ sub open {
 
     $self->{out} .= '<ol style="list-style-type: ' . $lists{$style} . ';">';
     $self->{in}->{ul}++;
-    1;
+    return 1;
 }
 
 =head2 close

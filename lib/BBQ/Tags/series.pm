@@ -5,6 +5,7 @@ sub open {
     my ( $self, $arg ) = @_;
     $self->{out} .= qq{<a href="/series$arg">};
     $self->{in}->{series}++;
+    1;
 }
 
 sub close {

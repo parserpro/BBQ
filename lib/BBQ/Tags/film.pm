@@ -5,6 +5,7 @@ sub open {
     my ( $self, $arg ) = @_;
     $self->{out} .= qq{<a href="/film$arg">};
     $self->{in}->{film}++;
+    1;
 }
 
 sub close {

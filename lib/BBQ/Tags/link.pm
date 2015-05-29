@@ -6,6 +6,7 @@ sub open {
     $arg = substr($arg, 1) if index($arg, '/') == 0;
     $self->{out} .= qq{<a href="/$arg">};
     $self->{in}->{link}++;
+    1;
 }
 
 sub close {

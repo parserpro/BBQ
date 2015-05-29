@@ -1,22 +1,18 @@
 package BBQ::Formats;
 use common::sense;
-use utf8;
-
-=head1 NAME
-
-BBQ::Formats
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
 
 our %formats = (
-    default => [qw(b i u color * list size center img left right p code s q qoute url spoiler work work_t)],
+    default => [qw(* art article autor award b center code color contest dictor edition film h i img left link list
+                   news p pub right q s series size spoiler translator u url user work work_t)],
+    message => [qw(* art article autor award b center compl contest dictor edition film h i left link list news
+                   p pub right s series spoiler translator u url user video work)],
+    news    => [qw(* art article autor award b center compl contest dictor edition film h i left link list news
+                   p pub right s series spoiler translator u url user video work print_contest)],
+    blog    => [qw(* art article autor award b center compl contest dictor edition film h i left link list news
+                   p pub right s series spoiler translator u url user video work
+                   print_contest subtitle hr big)],
+    new     => [qw(code color q size)],
 );
-
-=head2 full_set
 
 sub full_set {
     my %tags;
@@ -29,7 +25,5 @@ sub full_set {
 
     return keys %tags;
 }
-
-=cut
 
 1;

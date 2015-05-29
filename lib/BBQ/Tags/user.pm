@@ -10,6 +10,7 @@ sub open {
 
     $self->{out} .= qq{<a href="/user}; #"
     $self->{in}->{user}++;
+    1;
 }
 
 sub text {

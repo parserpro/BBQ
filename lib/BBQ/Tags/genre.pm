@@ -5,6 +5,7 @@ sub open {
     my $self = shift;
     $self->{out} .= '<i>Жанр: ';
     $self->{in}->{genre}++;
+    1;
 }
 
 sub close {

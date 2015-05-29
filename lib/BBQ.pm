@@ -2,7 +2,7 @@ package BBQ;
 
 use 5.010;
 use strict;
-use warnings FATAL => 'all';
+#use warnings FATAL => 'all';
 use utf8;
 use FindBin;
 use BBQ::Formats;
@@ -41,6 +41,8 @@ $bbq = {
     'path'     => [],        # current path, similair to XPath
     'leave'    => 1,         # leave unhandled tags as is
     'pda'      => 0,         # mobile version requires different markup
+    'off'      => 0,         # ignore tags at all
+    'current'  => '',        # current tag, set in op
     @_,
 };
 
@@ -81,7 +83,7 @@ sub init {
     my ( $class, %args ) = @_;
     $bbq->{enabled} = {};
 
-    for ( grep {exists $args{$_}} qw(debug format set leave pda path in out) ) {
+    for ( grep {exists $args{$_}} qw(debug format set leave pda path in out off) ) {
         $bbq->{$_} = $args{$_}
     };
 
@@ -108,12 +110,17 @@ sub parse {
     while ( $content =~ /\G(?:.*?)(?:\[([^\]]+)\]|([^\[]+))/gs ) {
         my ($tag, $text) = ($1, $2);
 
+warn "off: $bbq->{off} " . ( $tag ? "tag: $tag" : '' ) . ( $text ? "text: $text" : '') . "\n" if $bbq->{debug};
+
+        if ( $bbq->{off} && $tag && $bbq->{current} ne $tag ) {
+            $text = '[' . $tag . ']';
+            $tag  = undef;
+        }
+
         if ( $tag ) {
             my $t = index($tag, '=');
             my $arg;
             ( $tag, $arg ) = ( substr($tag, 0, $t), substr($tag, ++$t) ) if $t > -1;
-
-            $tag = lc $tag;
 
             if ( index($tag, '/') == 0 && ref $bbq->{on_close} eq 'CODE' ) {
                 $tag = substr($tag, 1);
@@ -136,6 +143,22 @@ sub parse {
     return $bbq->{out};
 }
 
+=head2 off
+
+=cut
+
+sub off {
+    $bbq->{off} = 1;
+}
+
+=head2 on
+
+=cut
+
+sub on {
+    $bbq->{off} = 0;
+}
+
 =head2 default
 
 =cut
@@ -152,6 +175,7 @@ sub default {
         path   => [],
         in     => {},
         out    => '',
+        off    => 0,
         %args,
     );
 }
@@ -251,14 +275,19 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 sub op {
     my ($tag, $arg ) = @_;
+    warn "op: [$tag], [$arg]\n" if $bbq->{debug};
+
+    my $tag_lc = lc $tag;
 
     # если тэг разрешен и у него есть обработчик открытия тэга
-    if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'open'}->{$tag} ) {
+    if ( exists $bbq->{'enabled'}->{$tag_lc} && exists $bbq->{'open'}->{$tag_lc} ) {
+        $bbq->{current} = '/' . $tag_lc;
+
         # добавляем тэг к текущему пути
-        push @{$bbq->{path}}, $tag;
+        push @{$bbq->{path}}, $tag_lc;
 
         # если обработчик открытия тэга не вернул TRUE
-        unless ( $bbq->{'open'}->{$tag}->($bbq, $arg) ) {
+        unless ( $bbq->{'open'}->{$tag_lc}->($bbq, $arg) ) {
             # убираем тэг от текущего пути
             pop @{$bbq->{path}};
 
@@ -268,7 +297,7 @@ sub op {
         };
 
         # tag shouldn't be closed - wipe it out
-        pop @{$bbq->{path}} unless exists $bbq->{'close'}->{$tag};
+        pop @{$bbq->{path}} unless exists $bbq->{'close'}->{$tag_lc};
     }
     elsif ( $bbq->{leave} ) {
         $bbq->{out} .= '[' . $tag . ( $arg ? '=' . $arg : '' ) . ']';
@@ -280,11 +309,15 @@ sub op {
 
 sub cl {
     my ($tag) = @_;
+    warn "cl: [$tag]\n" if $bbq->{debug};
 
-    if ( exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'close'}->{$tag} && @{$bbq->{path}} ) {
+    my $tag_lc = lc $tag;
+
+    # если тэг разрешен, для него есть обработчик закрытия и есть что закрывать
+    if ( exists $bbq->{'enabled'}->{$tag_lc} && exists $bbq->{'close'}->{$tag_lc} && @{$bbq->{path}} ) {
         if ( $bbq->{path}->[-1] ne 'work_t' ) {
             # at first, we should close previouse opened tag
-            while ( @{$bbq->{path}} && $bbq->{path}->[-1] ne $tag ) {
+            while ( @{$bbq->{path}} && $bbq->{path}->[-1] ne $tag_lc ) {
                 $bbq->{on_close}->($bbq->{path}->[-1]);
             }
         }
@@ -295,7 +328,7 @@ sub cl {
             return;
         }
 
-        $bbq->{'close'}->{$tag}->($bbq);
+        $bbq->{'close'}->{$tag_lc}->($bbq);
         pop @{$bbq->{path}} if $bbq->{path};
     }
     elsif ( $bbq->{leave} ) {
@@ -309,6 +342,7 @@ sub cl {
 sub tx {
     my ($text) = @_;
     my $tag = $bbq->{path}->[-1];
+    warn "tx: [$tag], [$text]\n" if $bbq->{debug};
 
     if ( $tag && exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'text'}->{$tag} && $bbq->{in}->{$tag} ) {
         $bbq->{'text'}->{$tag}->($bbq, @_);
@@ -363,7 +397,7 @@ sub import {
     }
 
     bless $bbq, __PACKAGE__;
-    &default();
+#    &default();
     $imported++;
 }
 

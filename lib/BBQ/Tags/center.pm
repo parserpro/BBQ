@@ -14,7 +14,7 @@ Version 0.01
 
 sub open {
     my $self = shift;
-    $self->{out} .= '<p style="text-align: center">';
+    $self->{out} .= '<center>';
     $self->{in}->{center}++;
     1;
 }
@@ -25,7 +25,7 @@ sub open {
 sub close {
     my $self = shift;
     return unless $self->{in}->{center};
-    $self->{out} .= '</p>';
+    $self->{out} .= '</center>';
     $self->{in}->{center}--;
 }
 

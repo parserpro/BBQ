@@ -5,6 +5,7 @@ sub open {
     my ( $self, $arg ) = @_;
     $self->{out} .= qq{<a href="/translator$arg">};
     $self->{in}->{translator}++;
+    1;
 }
 
 sub close {

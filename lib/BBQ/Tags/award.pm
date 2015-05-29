@@ -5,6 +5,7 @@ sub open {
     my ( $self, $arg ) = @_;
     $self->{out} .= qq{<a href="/award$arg">};
     $self->{in}->{award}++;
+    1;
 }
 
 sub close {

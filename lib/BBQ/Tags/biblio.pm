@@ -54,6 +54,7 @@ sub open {
     };
     $self->{out} .= $html;
     $self->{in}->{biblio}++;
+    1;
 }
 
 sub close {

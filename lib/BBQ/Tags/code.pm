@@ -14,6 +14,7 @@ Version 0.01
 
 sub open {
     my ( $self, $name ) = @_;
+    $self->off;
     $self->{out} .= qq{<fieldset class="q pre"><legend>$name</legend>};
     $self->{in}->{code}++;
     1;
@@ -24,9 +25,11 @@ sub open {
 
 sub text {
     my ( $self, $text ) = @_;
+    $text =~ s/\[/&#091;/ig;
+    $text =~ s/\]/&#093;/ig;
     $text =~ s/\</&lt;/ig;
     $text =~ s/\>/&gt;/ig;
-    $text =~ s/\t/    /ig;
+    $text =~ s/\t/        /ig;
     $self->{out} .= $text;
 }
 

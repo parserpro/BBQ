@@ -61,7 +61,9 @@ sub open {
     }
 
     $self->{in}->{work_t_data} = '(' . join(', ', @{$self->{in}->{work_t_data}}) . ')' if $self->{in}->{work_t_data};
-    my $popup_hint = (Profile->disable_popup_hint?'':" class=\"fantlab work_$work_id\" data-fantlab_type=\"work\" data-fantlab_id=\"$work_id\"");
+    my $popup_hint = Profile->disable_popup_hint
+        ? ''
+        : qq{ class="fantlab work_$work_id" data-fantlab_type="work" data-fantlab_id="$work_id"};
     $self->{out} .= qq{<span$popup_hint><a href="/work$work_id">};
     $self->{in}->{work_t}++;
     1;

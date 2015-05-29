@@ -12,4 +12,4 @@ use_ok( 'BBQ' ) || print "Bail out!\n";
 my $text = 'pre [center]bold[/center] past';
 my $bbq = BBQ->new;
 my $out = $bbq->parse($text);
-is($out, 'pre <p style="text-align: center">bold</p> past', 'Simple [u]');
+is($out, 'pre <center>bold</center> past', 'Simple [center]');

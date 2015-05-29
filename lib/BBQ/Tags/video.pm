@@ -11,12 +11,7 @@ my %video_whitelist = (
                 my (@args) = @_;
 
                 return qq~
-<object width="$x" height="$y">
-    <param name="movie" value="http://www.youtube.com/v/$args[0]&fs=1"></param>
-    <param name="allowFullScreen" value="true"></param>
-    <param name="wmode" value="transparent"></param>
-    <embed src="http://www.youtube.com/v/$args[0]&fs=1" type="application/x-shockwave-flash" allowfullscreen="true" wmode="transparent" width="$x" height="$y"></embed>
-</object>
+<iframe width="$x" height="$y" src="//www.youtube.com/embed/$args[0]?rel=0" frameborder="0" allowfullscreen></iframe>
 ~;
             },
         },
@@ -58,6 +53,8 @@ sub open {
     else {
         $self->{in}->{video}++;
     }
+
+    1;
 }
 
 sub close {

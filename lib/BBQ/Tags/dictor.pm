@@ -6,6 +6,7 @@ sub open {
     my @args = split /\:/, $arg;
     $self->{out} .= qq{<a href="/dictor$args[0]"} . ( $args[1] ? qq~ title="$args[1]"~ : '') . '>'; #'
     $self->{in}->{dictor}++;
+    1;
 }
 
 sub close {
