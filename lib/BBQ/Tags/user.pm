@@ -16,14 +16,14 @@ sub open {
 sub text {
     my ( $self, $text ) = @_;
 
-    if ( $self->{in}->{user_arg} ) {
+    if ( exists $self->{in}->{user_arg} ) {
         $self->{out} .= delete $self->{in}->{user_arg};
     }
     else {
         $self->{out} .= '/' . lc($text);
     }
 
-    $self->{out} .=  '">' . $text;
+    $self->{out} .=  '"' . $self->{extra}->{links_class}. '>' . $text;
 }
 
 sub close {

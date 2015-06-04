@@ -64,7 +64,7 @@ sub open {
     my $popup_hint = Profile->disable_popup_hint
         ? ''
         : qq{ class="fantlab work_$work_id" data-fantlab_type="work" data-fantlab_id="$work_id"};
-    $self->{out} .= qq{<span$popup_hint><a href="/work$work_id">};
+    $self->{out} .= qq{<span$popup_hint><a href="/work$work_id"$self->{extra}->{links_class}>};
     $self->{in}->{work_t}++;
     1;
 }

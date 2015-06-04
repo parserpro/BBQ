@@ -17,7 +17,7 @@ is($out, 'pre <ol style="list-style-type: disc;"><li>1</li><li>2</li><li>3</li><
 $bbq->default;
 $text = 'pre [list][*]1[*]2[list][*]2.1[*]2.2[/list][*]3[/list] past';
 $out = $bbq->parse($text);
-is($out, 'pre <ol style="list-style-type: disc;"><li>1</li><li>2<ol style="list-style-type: disc;"><li>2.1</li><li>2.2</li></ol></li><li>3</li></ol> past', 'Nested [list]');
+is($out, 'pre <ol style="list-style-type: disc;"><li>1</li><li>2<ol style="list-style-type: circle;"><li>2.1</li><li>2.2</li></ol></li><li>3</li></ol> past', 'Nested [list]');
 
 $bbq->default;
 $text = 'pre [list=1][*]1[*]2[/list] past';

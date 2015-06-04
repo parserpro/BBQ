@@ -3,7 +3,7 @@ use common::sense;
 
 sub open {
     my ( $self, $arg ) = @_;
-    $self->{out} .= qq{<a href="/contest$arg">};
+    $self->{out} .= qq{<a href="/contest$arg"$self->{extra}->{links_class}>};
     $self->{in}->{contest}++;
     1;
 }

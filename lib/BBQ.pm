@@ -43,6 +43,7 @@ $bbq = {
     'pda'      => 0,         # mobile version requires different markup
     'off'      => 0,         # ignore tags at all
     'current'  => '',        # current tag, set in op
+    'extra'    => {},        # extra custom parameters for handlers
     @_,
 };
 
@@ -83,7 +84,7 @@ sub init {
     my ( $class, %args ) = @_;
     $bbq->{enabled} = {};
 
-    for ( grep {exists $args{$_}} qw(debug format set leave pda path in out off) ) {
+    for ( grep {exists $args{$_}} qw(debug format set leave pda path in out off extra) ) {
         $bbq->{$_} = $args{$_}
     };
 
@@ -110,7 +111,7 @@ sub parse {
     while ( $content =~ /\G(?:.*?)(?:\[([^\]]+)\]|([^\[]+))/gs ) {
         my ($tag, $text) = ($1, $2);
 
-warn "off: $bbq->{off} " . ( $tag ? "tag: $tag" : '' ) . ( $text ? "text: $text" : '') . "\n" if $bbq->{debug};
+        warn "off: $bbq->{off} " . ( $tag ? "tag: $tag" : '' ) . ( $text ? "text: $text" : '') . "\n" if $bbq->{debug};
 
         if ( $bbq->{off} && $tag && $bbq->{current} ne $tag ) {
             $text = '[' . $tag . ']';
@@ -176,6 +177,7 @@ sub default {
         in     => {},
         out    => '',
         off    => 0,
+        extra  => {},
         %args,
     );
 }

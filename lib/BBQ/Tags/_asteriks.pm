@@ -27,4 +27,12 @@ sub open {
     1;
 }
 
+=head2 text
+=cut
+
+sub text {
+    my ($self, $text) = @_;
+    $text =~ s/\n//g;
+}
+
 1;

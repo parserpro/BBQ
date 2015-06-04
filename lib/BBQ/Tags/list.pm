@@ -23,14 +23,18 @@ my %lists = (
     n => 'none',
 );
 
+my @def = qw(o O);
+
 sub open {
     my ( $self, $style ) = @_;
+    $self->{in}->{ul}++;
+    $style = $def[$self->{in}->{ul} % 2] unless $style;
     $style = 'O' unless $style;
     return unless $lists{$style};
 
     $self->{out} .= '<ol style="list-style-type: ' . $lists{$style} . ';">';
-    $self->{in}->{ul}++;
-    return 1;
+
+    1;
 }
 
 =head2 close

@@ -28,7 +28,7 @@ sub open {
                         ', ',
                         map {
                             "<a href=\"/translator$_\">" .
-                            BD::Person->get_person_name_rp('translator', $_) .
+                            BD::Person->get_person_name_rp($_, 'translator') .
                             '</a>'
                         }
                         grep { $_}
@@ -41,7 +41,7 @@ sub open {
                     join(
                         ', ',
                         map {
-                            "<a href=\"/art$_\">" . BD::Person->get_person_name_rp('art', $_) . '</a>'
+                            "<a href=\"/art$_\">" . BD::Person->get_person_name_rp($_, 'art') . '</a>'
                         }
                         grep { $_ }
                         split ',', $arts
@@ -50,8 +50,8 @@ sub open {
                );
 
     $self->{in}->{work_t_data} = $data ? " ($data)" : '';
-    my $popup_hint = (Profile->disable_popup_hint?'':" class=\"fantlab work_$work_id\" data-fantlab_type=\"work\" data-fantlab_id=\"$work_id\"");
-    $self->{out} .= qq{<span$popup_hint><a href="/work$work_id">};
+    my $popup_hint = (Profile->disable_popup_hint ? '' : qq{ class="fantlab work_$work_id" data-fantlab_type="work" data-fantlab_id="$work_id"});
+    $self->{out} .= qq{<span$popup_hint><a href="/work$work_id"$self->{extra}->{links_class}>};
     $self->{in}->{work}++;
     1;
 }

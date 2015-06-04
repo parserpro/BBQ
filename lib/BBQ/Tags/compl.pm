@@ -4,7 +4,7 @@ use common::sense;
 sub open {
     my ( $self, $arg ) = @_;
     my @args = split /\:/, $arg;
-    $self->{out} .= qq{<a href="/autor$args[0]"} . ( $args[1] ? qq~ title="$args[1]"~ : '') . '>'; #'
+    $self->{out} .= qq{<a href="/autor$args[0]"$self->{extra}->{links_class}} . ( $args[1] ? qq~ title="$args[1]"~ : '') . '>'; #'
     $self->{in}->{compl}++;
     1;
 }
