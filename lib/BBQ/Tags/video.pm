@@ -1,6 +1,15 @@
 package BBQ::Tags::video;
 use common::sense;
 
+=head1 NAME
+
+BBQ::Tags::_asteriks
+
+=head1 VERSION
+
+Version 0.01
+=cut
+
 my ($x, $y);
 
 my %video_whitelist = (
@@ -10,13 +19,14 @@ my %video_whitelist = (
             'code' => sub {
                 my (@args) = @_;
 
-                return qq~
-<iframe width="$x" height="$y" src="//www.youtube.com/embed/$args[0]?rel=0" frameborder="0" allowfullscreen></iframe>
-~;
+                return qq~<iframe width="$x" height="$y" src="//www.youtube.com/embed/$args[0]?rel=0" frameborder="0" allowfullscreen></iframe>~;
             },
         },
     ],
 );
+
+=head2 process_video
+=cut
 
 sub process_video {
     my ($self, $arg) = @_;
@@ -33,6 +43,9 @@ MAIN:
         }
     }
 }
+
+=head2 open
+=cut
 
 sub open {
     my ( $self, $arg ) = @_;
@@ -57,12 +70,18 @@ sub open {
     1;
 }
 
+=head2 close
+=cut
+
 sub close {
     my $self = shift;
     return unless $self->{in}->{video};
 
     $self->{in}->{video}--;
 }
+
+=head2 text
+=cut
 
 sub text {
     my ( $self, $arg ) = @_;

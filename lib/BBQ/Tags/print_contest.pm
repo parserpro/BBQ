@@ -1,6 +1,17 @@
 package BBQ::Tags::print_contest;
 use common::sense;
 
+=head1 NAME
+
+BBQ::Tags::print_contest
+
+=head1 VERSION
+
+Version 0.01
+
+=head2 open
+=cut
+
 sub open {
     my ( $self, $contest_id ) = @_;
 

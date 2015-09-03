@@ -14,7 +14,7 @@ Version 0.01
 
 sub open {
     my $self = shift;
-    $self->{out} .= '<p>';
+    $self->{out} .= '<p class="abzac">';
     $self->{in}->{p}++;
     1;
 }

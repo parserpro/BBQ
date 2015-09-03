@@ -15,7 +15,7 @@ Version 0.01
 sub open {
     my ( $self, $name ) = @_;
     $self->off;
-    $self->{out} .= qq{<fieldset class="q pre"><legend>$name</legend>};
+    $self->{out} .= qq{<fieldset class="quote pre"><legend>$name</legend>};
     $self->{in}->{code}++;
     1;
 }
@@ -41,6 +41,7 @@ sub close {
     return unless $self->{in}->{code};
     $self->{out} .= '</fieldset>';
     $self->{in}->{code}--;
+    $self->on;
 }
 
 1;

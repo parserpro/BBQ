@@ -36,7 +36,7 @@ sub open {
                 ', ',
                 # получаем куски строки из id-шников
                 map {
-                    "<a href=\"/translator$_\">" .
+                    "<a class=\"agray\" href=\"/translator$_\">" .
                     BD::Person->get_person_name_rp($_, 'translator') .
                     '</a>'
                 }
@@ -53,14 +53,14 @@ sub open {
             join(
                 ', ',
                 map {
-                    "<a href=\"/art$_\">" . BD::Person->get_person_name_rp($_, 'art') . '</a>'
+                    "<a class=\"agray\" href=\"/art$_\">" . BD::Person->get_person_name_rp($_, 'art') . '</a>'
                 }
                 grep { $_ }
                 split ',', $arts
             );
     }
 
-    $self->{in}->{work_t_data} = '(' . join(', ', @{$self->{in}->{work_t_data}}) . ')' if $self->{in}->{work_t_data};
+    $self->{in}->{work_t_data} = ' (' . join(', ', @{$self->{in}->{work_t_data}}) . ')' if $self->{in}->{work_t_data};
     my $popup_hint = Profile->disable_popup_hint
         ? ''
         : qq{ class="fantlab work_$work_id" data-fantlab_type="work" data-fantlab_id="$work_id"};

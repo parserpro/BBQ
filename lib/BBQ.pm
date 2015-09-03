@@ -44,6 +44,7 @@ $bbq = {
     'off'      => 0,         # ignore tags at all
     'current'  => '',        # current tag, set in op
     'extra'    => {},        # extra custom parameters for handlers
+    'prev_hdl' => undef,     # previous handler, for correct [ handling
     @_,
 };
 
@@ -90,6 +91,7 @@ sub init {
 
     $bbq->{set} = $BBQ::Formats::formats{$bbq->{'format'}} if ! $bbq->{set} || exists $args{'format'};
     $bbq->{enabled}->{$_}++ for @{$bbq->{set}};
+    return;
 }
 
 =head2 parse
@@ -98,6 +100,8 @@ sub init {
 
 sub parse {
     my ($class, $content, %args) = @_;
+
+    warn "content: $content" if $bbq->{debug};
 
     # чтоб не поломать старый код
     $bbq = $class if ref $class;
@@ -108,9 +112,25 @@ sub parse {
     $bbq->{out}  = '';
     $bbq->{path} = [];
 
-    while ( $content =~ /\G(?:.*?)(?:\[([^\]]+)\]|([^\[]+))/gs ) {
-        my ($tag, $text) = ($1, $2);
+    warn "content: $content" if $bbq->{debug};
 
+    while ( $content =~ /\G        # store position
+                           (?:.*?) # for string beginning
+                           (?:     # do not capture
+                             \[    # tag start
+                                (  # capture 1, for tag
+                                  [^\[]*? # not an opening [, not greedy, may be empty
+                                )  # capture 1 end
+                             \]    # tag end
+                           |
+                             (       # capture 2, tor text
+                               .+?   # text, may be empty
+                               (?=\[|$)  # positive lookahead for tag start
+                             ) # capture 2 end
+                           )/igsxo ) {
+        my ($tag, $text) = ($1, $2);
+        $text = $3 if defined $3;
+        warn "capture ~$1~ ~$2~ ~$3~\n" if $bbq->{debug};
         warn "off: $bbq->{off} " . ( $tag ? "tag: $tag" : '' ) . ( $text ? "text: $text" : '') . "\n" if $bbq->{debug};
 
         if ( $bbq->{off} && $tag && $bbq->{current} ne $tag ) {
@@ -130,7 +150,12 @@ sub parse {
                 next;
             }
 
-            $bbq->{on_open}->($tag, $arg) if ref $bbq->{on_open} eq 'CODE';
+            if ( exists $bbq->{'open'}->{lc $tag} ) {
+                $bbq->{on_open}->($tag, $arg) if ref $bbq->{on_open} eq 'CODE';
+            }
+            else {
+                $bbq->{on_text}->('[' . $tag . ']') if ref $bbq->{on_text} eq 'CODE';
+            }
         }
         else {
             $bbq->{on_text}->($text) if ref $bbq->{on_text} eq 'CODE';
@@ -150,6 +175,7 @@ sub parse {
 
 sub off {
     $bbq->{off} = 1;
+    return;
 }
 
 =head2 on
@@ -158,6 +184,7 @@ sub off {
 
 sub on {
     $bbq->{off} = 0;
+    return;
 }
 
 =head2 default
@@ -169,17 +196,18 @@ sub default {
     my %args = @_;
     init(
         'fake_class',
-        debug  => 0,
+        debug    => 0,
         ( ! exists $args{set} ? (format => 'default') : () ),
-        leave  => 1,
-        pda    => 0,
-        path   => [],
-        in     => {},
-        out    => '',
-        off    => 0,
-        extra  => {},
+        leave    => 1,
+        pda      => 0,
+        path     => [],
+        in       => {},
+        out      => '',
+        off      => 0,
+        extra    => {},
         %args,
     );
+    return;
 }
 
 =head1 AUTHOR
@@ -304,6 +332,8 @@ sub op {
     elsif ( $bbq->{leave} ) {
         $bbq->{out} .= '[' . $tag . ( $arg ? '=' . $arg : '' ) . ']';
     }
+
+    return;
 }
 
 =head2 cl
@@ -336,6 +366,8 @@ sub cl {
     elsif ( $bbq->{leave} ) {
         $bbq->{out} .= '[/' . $tag . ']';
     }
+
+    return;
 }
 
 =head2 tx
@@ -344,7 +376,9 @@ sub cl {
 sub tx {
     my ($text) = @_;
     my $tag = $bbq->{path}->[-1];
+
     warn "tx: [$tag], [$text]\n" if $bbq->{debug};
+
 
     if ( $tag && exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'text'}->{$tag} && $bbq->{in}->{$tag} ) {
         $bbq->{'text'}->{$tag}->($bbq, @_);
@@ -352,6 +386,8 @@ sub tx {
     else {
         $bbq->{out} .= $text;
     }
+
+    return;
 }
 
 sub import {
@@ -399,8 +435,9 @@ sub import {
     }
 
     bless $bbq, __PACKAGE__;
-#    &default();
     $imported++;
+
+    return;
 }
 
 

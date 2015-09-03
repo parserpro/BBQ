@@ -2,6 +2,17 @@ package BBQ::Tags::biblio;
 use common::sense;
 use Helpers::Default;
 
+=head1 NAME
+
+BBQ::Tags::biblio
+
+=head1 VERSION
+
+Version 0.01
+
+=head2 open
+=cut
+
 sub open {
     my ($self, $arg) = @_;
     my $autor_id = $arg;
@@ -56,6 +67,9 @@ sub open {
     $self->{in}->{biblio}++;
     1;
 }
+
+=head2 close
+=cut
 
 sub close {
     my $self = shift;
