@@ -1,4 +1,4 @@
-BBQ [![Build Status](https://travis-ci.org/parserpro/BBQ.png?branch=master)](https://travis-ci.org/parserpro/BBQ)
+BBQ
 ---
 
 BBQ - fastest pure Perl BBCode parser
