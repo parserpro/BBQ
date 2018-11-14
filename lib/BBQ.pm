@@ -3,11 +3,14 @@ package BBQ;
 use 5.010;
 use strict;
 #use warnings FATAL => 'all';
-use utf8;
+use utf8::all;
+use Encode;
 use FindBin;
 use BBQ::Formats;
 use Carp;
+use URI::Find;
 use Data::Dumper;
+#use Devel::StackTrace;
 
 =head1 NAME
 
@@ -19,6 +22,17 @@ Version 0.01
 
 =cut
 
+$Data::Dumper::Useperl = 1;
+$Data::Dumper::Useqq = 1;
+
+{ no warnings 'redefine';
+    sub Data::Dumper::qquote {
+        my $s = shift;
+        return "'$s'";
+    }
+}
+
+
 our $VERSION = '0.01';
 
 
@@ -27,24 +41,26 @@ my %all;
 
 my $bbq;
 $bbq = {
-    'debug'    => 0,         # debug flag
-    'in'       => {},        # counter for tags
-    'out'      => '',        # putput buffer
-    'format'   => 'default', # default format name
-    'open'     => {},        #----
-    'text'     => {},        # hashes with coderefs for tags handlers
-    'close'    => {},        #----
-    'set'      => [],        # set of tags to handle
-    'on_open'  => \&op,
-    'on_close' => \&cl,
-    'on_text'  => \&tx,
-    'path'     => [],        # current path, similair to XPath
-    'leave'    => 1,         # leave unhandled tags as is
-    'pda'      => 0,         # mobile version requires different markup
-    'off'      => 0,         # ignore tags at all
-    'current'  => '',        # current tag, set in op
-    'extra'    => {},        # extra custom parameters for handlers
-    'prev_hdl' => undef,     # previous handler, for correct [ handling
+    'debug'      => 0,         # debug flag
+    'in'         => {},        # counter for tags
+    'out'        => '',        # putput buffer
+    'format'     => 'default', # default format name
+    'open'       => {},        #----
+    'text'       => {},        # hashes with coderefs for tags handlers
+    'close'      => {},        #----
+    'set'        => [],        # set of tags to handle
+    'on_open'    => \&op,
+    'on_close'   => \&cl,
+    'on_text'    => \&tx,
+    'path'       => [],        # current path, similair to XPath
+    'leave'      => 1,         # leave unhandled tags as is
+    'links'      => 1,         # auto-highlight links in text
+    'pda'        => 0,         # mobile version requires different markup
+    'off'        => 0,         # ignore tags at all
+    'current'    => '',        # current tag, set in op
+    'extra'      => {},        # extra custom parameters for handlers
+    'prev_hdl'   => undef,     # previous handler, for correct [ handling
+    'uri_finder' => URI::Find->new(\&uri_callback), # set callback for URI::Finder
     @_,
 };
 
@@ -85,12 +101,15 @@ sub init {
     my ( $class, %args ) = @_;
     $bbq->{enabled} = {};
 
-    for ( grep {exists $args{$_}} qw(debug format set leave pda path in out off extra) ) {
+    for ( grep {exists $args{$_}} qw(debug extra format in leave links off out path pda set) ) {
         $bbq->{$_} = $args{$_}
     };
 
     $bbq->{set} = $BBQ::Formats::formats{$bbq->{'format'}} if ! $bbq->{set} || exists $args{'format'};
     $bbq->{enabled}->{$_}++ for @{$bbq->{set}};
+
+    warn "\n=== BBQ INITED ===\n" if $bbq->{debug};
+
     return;
 }
 
@@ -101,8 +120,6 @@ sub init {
 sub parse {
     my ($class, $content, %args) = @_;
 
-    warn "content: $content" if $bbq->{debug};
-
     # чтоб не поломать старый код
     $bbq = $class if ref $class;
 
@@ -112,7 +129,10 @@ sub parse {
     $bbq->{out}  = '';
     $bbq->{path} = [];
 
-    warn "content: $content" if $bbq->{debug};
+    warn Dumper(\@_) if $bbq->{debug};
+
+
+    warn "Incoming content: $content" if $bbq->{debug};
 
     while ( $content =~ /\G        # store position
                            (?:.*?) # for string beginning
@@ -130,10 +150,11 @@ sub parse {
                            )/igsxo ) {
         my ($tag, $text) = ($1, $2);
         $text = $3 if defined $3;
-        warn "capture ~$1~ ~$2~ ~$3~\n" if $bbq->{debug};
-        warn "off: $bbq->{off} " . ( $tag ? "tag: $tag" : '' ) . ( $text ? "text: $text" : '') . "\n" if $bbq->{debug};
+        warn "= CAPTURE:\n\ttag:  $1\n\ttext1: $2\n\ttext2: $3\n" if $bbq->{debug};
+        warn "= FLAGS: off: $bbq->{off} " . ( $tag ? "tag: $tag" : '' ) . ( $text ? "text: $text" : '') . "\n" if $bbq->{debug};
 
         if ( $bbq->{off} && $tag && $bbq->{current} ne $tag ) {
+            warn "== Bypass processing as OFF active" if $bbq->{debug};
             $text = '[' . $tag . ']';
             $tag  = undef;
         }
@@ -154,12 +175,19 @@ sub parse {
                 $bbq->{on_open}->($tag, $arg) if ref $bbq->{on_open} eq 'CODE';
             }
             else {
-                $bbq->{on_text}->('[' . $tag . ']') if ref $bbq->{on_text} eq 'CODE';
+                if ( $arg ) {
+                    $bbq->{on_text}->('[' . $tag . '=' . $arg . ']') if ref $bbq->{on_text} eq 'CODE';
+                }
+                else {
+                    $bbq->{on_text}->('[' . $tag . ']') if ref $bbq->{on_text} eq 'CODE';
+                }
             }
         }
         else {
             $bbq->{on_text}->($text) if ref $bbq->{on_text} eq 'CODE';
         }
+
+        warn "=== ITERATION RESULT: [$bbq->{out}]\n" if $bbq->{debug};
     }
 
     for my $tag ( reverse @{$bbq->{path}} ) {
@@ -199,6 +227,7 @@ sub default {
         debug    => 0,
         ( ! exists $args{set} ? (format => 'default') : () ),
         leave    => 1,
+        links    => 1,
         pda      => 0,
         path     => [],
         in       => {},
@@ -305,12 +334,15 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 sub op {
     my ($tag, $arg ) = @_;
-    warn "op: [$tag], [$arg]\n" if $bbq->{debug};
+    warn "=== open: [$tag], [$arg]\n" if $bbq->{debug};
 
     my $tag_lc = lc $tag;
 
+    warn "=== enabled: " . exists( $bbq->{'enabled'}->{$tag_lc} ) . "\n=== has handler: " . exists( $bbq->{'open'}->{$tag_lc} ) . "\n" if $bbq->{debug};
+
     # если тэг разрешен и у него есть обработчик открытия тэга
     if ( exists $bbq->{'enabled'}->{$tag_lc} && exists $bbq->{'open'}->{$tag_lc} ) {
+warn "=== TAG [$tag] enabled and handler defined\n" if $bbq->{debug};
         $bbq->{current} = '/' . $tag_lc;
 
         # добавляем тэг к текущему пути
@@ -318,6 +350,7 @@ sub op {
 
         # если обработчик открытия тэга не вернул TRUE
         unless ( $bbq->{'open'}->{$tag_lc}->($bbq, $arg) ) {
+warn "=== TAG [$tag] handler returned FALSE\n" if $bbq->{debug};
             # убираем тэг от текущего пути
             pop @{$bbq->{path}};
 
@@ -330,6 +363,7 @@ sub op {
         pop @{$bbq->{path}} unless exists $bbq->{'close'}->{$tag_lc};
     }
     elsif ( $bbq->{leave} ) {
+warn "=== leave tag [$tag] as is\n" if $bbq->{debug};
         $bbq->{out} .= '[' . $tag . ( $arg ? '=' . $arg : '' ) . ']';
     }
 
@@ -377,17 +411,45 @@ sub tx {
     my ($text) = @_;
     my $tag = $bbq->{path}->[-1];
 
-    warn "tx: [$tag], [$text]\n" if $bbq->{debug};
+    warn "== tx: [$tag], [$text]\n" if $bbq->{debug};
 
 
     if ( $tag && exists $bbq->{'enabled'}->{$tag} && exists $bbq->{'text'}->{$tag} && $bbq->{in}->{$tag} ) {
         $bbq->{'text'}->{$tag}->($bbq, @_);
     }
     else {
+        warn "== BEFORE AUTOLINKS: off: $bbq->{off}\n" if $bbq->{debug};
+
+        # подсветка ссылок в тексте
+        if ( $bbq->{links} && $text && ! $bbq->{off} ) {
+            warn "=== AUTOLINKS: $bbq->{links} [$text]\n" if $bbq->{debug};
+            $bbq->{uri_finder}->find(\$text);
+            warn "=== AFTER AUTOLINKS: $bbq->{links} [$text]\n" if $bbq->{debug};
+        }
+
         $bbq->{out} .= $text;
     }
 
     return;
+}
+
+=head2 uri_callback
+=cut
+
+sub uri_callback {
+#    warn encode('utf8', Devel::StackTrace->new->as_string);
+    my $uri = $_[1];
+
+    my $uri_name = $uri;
+    my $internal = 0;
+    if ($uri =~ /^(https?\:\/\/.+?)(\/.+)$/) {
+      my ($s1, $s2) = ($1, $2);
+      $internal = 1 if ($s1 =~ /fantlab\.ru/);
+#      $s2 =~ s/([\#\&\?\/]+)/$1\&shy\;/g;
+      $uri_name = $s1.$s2;
+    }
+    my $nofollow = ($internal?'':' rel="nofollow"');
+    return qq{<a target="_blank"$nofollow href="$uri">$uri_name</a>};
 }
 
 sub import {
