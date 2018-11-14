@@ -444,7 +444,7 @@ sub uri_callback {
     my $internal = 0;
     if ($uri =~ /^(https?\:\/\/.+?)(\/.+)$/) {
       my ($s1, $s2) = ($1, $2);
-      $internal = 1 if ($s1 =~ /fantlab\.ru/);
+      $internal = 1 if ($s2 =~ /fantlab\.ru/);
 #      $s2 =~ s/([\#\&\?\/]+)/$1\&shy\;/g;
       $uri_name = $s1.$s2;
     }

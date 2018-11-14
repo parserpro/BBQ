@@ -12,7 +12,7 @@ Version 0.01
 
 our %formats = (
     default => [qw(* art article autor award b center code color contest dictor edition film genre h i img left link list
-                   news p pub q right s series size spoiler subtitle translator u url user work work_t)],
+                   news off p pub q right s series size spoiler subtitle translator u url user work work_t)],
     message => [qw(* art article autor award b center compl contest dictor edition film h i left link list news
                    p pub right s series spoiler translator u url user video work)],
     news    => [qw(* art article autor award b center compl contest dictor edition film h i left link list news

@@ -50,7 +50,7 @@ my $out6 = $bbq->parse(
     debug => 0,
     links => 1,
 );
-is($out6, '<div style="margin:8px 3px 0"><a href="<a target="_blank" href="http://fantlab.ru/work9452">http://fantlab.ru/work9452</a>"><img src="<a target="_blank" href="http://fantlab.ru/rating/9452.gif">http://fantlab.ru/rating/9452.gif</a>" border="0"></a></div>', 'New example with links, not an error!!!');
+is($out6, '<div style="margin:8px 3px 0"><a href="<a target="_blank" rel="nofollow" href="http://fantlab.ru/work9452">http://fantlab.ru/work9452</a>"><img src="<a target="_blank" rel="nofollow" href="http://fantlab.ru/rating/9452.gif">http://fantlab.ru/rating/9452.gif</a>" border="0"></a></div>', 'New example with links, not an error!!!');
 
 my $text7 = q~<font color=gray>[= В глубь веков; Машина для перемещения во времени; Через 800 000 лет. Машина времени]</font>~;
 my $out7 = $bbq->parse(
