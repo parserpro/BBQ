@@ -153,7 +153,7 @@ sub parse {
         warn "= CAPTURE:\n\ttag:  $1\n\ttext1: $2\n\ttext2: $3\n" if $bbq->{debug};
         warn "= FLAGS: off: $bbq->{off} " . ( $tag ? "tag: $tag" : '' ) . ( $text ? "text: $text" : '') . "\n" if $bbq->{debug};
 
-        if ( $bbq->{off} && $tag && $bbq->{current} ne $tag ) {
+        if ( $bbq->{off} && $tag && $bbq->{current} ne lc $tag ) {
             warn "== Bypass processing as OFF active" if $bbq->{debug};
             $text = '[' . $tag . ']';
             $tag  = undef;
