@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use Test::More;
 use utf8;
 
-plan tests => 8;
+plan tests => 10;
 
 use_ok( 'BBQ' ) || print "Bail out!\n";
 
@@ -61,3 +61,11 @@ my $out7 = $bbq->parse(
     leave => 1,
 );
 is($out7, '<font color=gray>[= В глубь веков; Машина для перемещения во времени; Через 800 000 лет. Машина времени]</font>', 'No cut unknown tag');
+
+my $text8 = 'pre [code=Примерчик]<xml> [comment][b]test[/b][/code] past[b]ttt[/b]';
+my $out8 = BBQ->new->parse($text8);
+is($out8, 'pre <fieldset class="quote pre"><legend>Примерчик</legend>&lt;xml&gt; &#091;comment&#093;&#091;b&#093;test&#091;/b&#093;</fieldset> past<strong>ttt</strong>', 'More [code]');
+
+my $text9 = 'pre [CODE=Примерчик]<xml> [comment][b]test[/b][/CODE] past[b]ttt[/b]';
+my $out9 = BBQ->new->parse($text9);
+is($out9, 'pre <fieldset class="quote pre"><legend>Примерчик</legend>&lt;xml&gt; &#091;comment&#093;&#091;b&#093;test&#091;/b&#093;</fieldset> past<strong>ttt</strong>', 'Uppercase [code]');
