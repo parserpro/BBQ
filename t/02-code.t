@@ -43,14 +43,14 @@ my $out5 = $bbq->parse(
 );
 is($out5, q~Имеем траблу с парсингом ссылок внутри блока code <fieldset class="quote pre"><legend>Code</legend>&lt;a href='http://fantlab.ru' title='Laboratory SF&amp;Fantasy'&gt;&lt;img src='http://fantlab.ru/images/flbutton.gif' width=99 height=75 border=0&gt;&lt;/a&gt;</fieldset>~, 'Mix with links and "link" param and <');
 
-my $text6 = q~<div style="margin:8px 3px 0"><a href="http://fantlab.ru/work9452"><img src="http://fantlab.ru/rating/9452.gif" border="0"></a></div>~;
+my $text6 = q~<div style="margin:8px 3px 0"><a href="http://fantlab2.ru/work9452"><img src="http://fantlab3.ru/rating/9452.gif" border="0"></a></div>~;
 my $out6 = $bbq->parse(
     $text6,
     set   => [qw(* b i u s p q h list img genre url code)],
     debug => 0,
     links => 1,
 );
-is($out6, '<div style="margin:8px 3px 0"><a href="<a target="_blank" rel="nofollow" href="http://fantlab.ru/work9452">http://fantlab.ru/work9452</a>"><img src="<a target="_blank" rel="nofollow" href="http://fantlab.ru/rating/9452.gif">http://fantlab.ru/rating/9452.gif</a>" border="0"></a></div>', 'New example with links, not an error!!!');
+is($out6, '<div style="margin:8px 3px 0"><a href="<a target="_blank" rel="nofollow" href="http://fantlab2.ru/work9452">http://fantlab2.ru/work9452</a>"><img src="<a target="_blank" rel="nofollow" href="http://fantlab3.ru/rating/9452.gif">http://fantlab3.ru/rating/9452.gif</a>" border="0"></a></div>', 'New example with links, not an error!!!');
 
 my $text7 = q~<font color=gray>[= В глубь веков; Машина для перемещения во времени; Через 800 000 лет. Машина времени]</font>~;
 my $out7 = $bbq->parse(

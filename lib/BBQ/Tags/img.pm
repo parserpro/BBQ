@@ -17,7 +17,7 @@ sub open {
     return 0 if $href =~ /[<>\"]/;
 
     if ( $href ) {
-        $self->{out} .= '<img src="' . $href . '" alt="" />';
+        $self->{out} .= '<img src="' . $href . '" class="adaptimg" alt=""/>';
         return 1;
     }
 
@@ -31,7 +31,7 @@ sub open {
 sub text {
     my ( $self, $text ) = @_;
 
-    $self->{out} .= '<img src="' . $text . '" alt="" />';
+    $self->{out} .= '<img src="' . $text . '" class="adaptimg" alt=""/>';
 }
 
 =head2 close

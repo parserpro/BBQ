@@ -14,6 +14,7 @@ Version 0.01
 
 sub open {
     my ( $self, $name ) = @_;
+    warn "=== running code::open" if $self->{debug};
     $self->off;
     $self->{out} .= qq{<fieldset class="quote pre"><legend>$name</legend>};
     $self->{in}->{code}++;
@@ -25,11 +26,13 @@ sub open {
 
 sub text {
     my ( $self, $text ) = @_;
+    warn "=== running code::text [$text]\n" if $self->{debug};
     $text =~ s/\[/&#091;/ig;
     $text =~ s/\]/&#093;/ig;
     $text =~ s/\</&lt;/ig;
     $text =~ s/\>/&gt;/ig;
     $text =~ s/\t/        /ig;
+    warn "=== code::text out [$text]\n" if $self->{debug};
     $self->{out} .= $text;
 }
 
@@ -38,10 +41,12 @@ sub text {
 
 sub close {
     my $self = shift;
+    warn "=== running code::close" if $self->{debug};
     return unless $self->{in}->{code};
     $self->{out} .= '</fieldset>';
     $self->{in}->{code}--;
     $self->on;
+    1;
 }
 
 1;

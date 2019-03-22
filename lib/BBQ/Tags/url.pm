@@ -15,8 +15,10 @@ Version 0.01
 sub open {
     my ( $self, $arg ) = @_;
 
-    if ( $arg =~ /^(?:http:\/\/)?(?:www\.)?fantlab\.ru(.+)$/ ) {
-        $self->{out} .= qq~<a href="$1">~;
+    if ( $arg =~ /^(https?:\/\/)?(www\.)?fantlab\.ru(.*)$/i ) {
+        my $u = $3;
+        $u = '/' unless ($u);
+        $self->{out} .= qq~<a href="$u">~;
         $self->{in}->{url}++;
     }
     else {

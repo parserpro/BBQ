@@ -16,10 +16,12 @@ sub open {
     my ( $self, $arg ) = @_;
 
     if ( $arg ) {
-        $self->{in}->{user_arg} = $arg;
+        $self->{out} .= qq{<a href="/user$arg">};
+    }
+    else {
+        $self->{out} .= qq{<a href="/user}; #"
     }
 
-    $self->{out} .= qq{<a href="/user}; #"
     $self->{in}->{user}++;
     1;
 }
@@ -30,13 +32,7 @@ sub open {
 sub text {
     my ( $self, $text ) = @_;
 
-    if ( exists $self->{in}->{user_arg} ) {
-        $self->{out} .= delete $self->{in}->{user_arg};
-    }
-    else {
-        $self->{out} .= '/' . lc($text);
-    }
-
+    $self->{out} .= '/' . lc($text);
     $self->{out} .=  '"' . $self->{extra}->{links_class}. '>' . $text;
 }
 
